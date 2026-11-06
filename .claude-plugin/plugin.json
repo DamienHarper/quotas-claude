@@ -1,0 +1,8 @@
+{
+  "name": "quotas-claude",
+  "version": "0.1.0",
+  "description": "Bande au-dessus du prompt : consommation des fenêtres 5 h et hebdomadaire, delta d'avance ou de retard, couleurs selon le niveau",
+  "author": { "name": "DamienHarper" },
+  "repository": "https://github.com/DamienHarper/quotas-claude",
+  "types": "./types/index.d.ts"
+}

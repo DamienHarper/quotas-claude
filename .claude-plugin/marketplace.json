@@ -1,0 +1,6 @@
+{
+  "name": "quotas-claude",
+  "owner": { "name": "DamienHarper" },
+  "description": "Mod Claude Code : quotas 5 h et hebdomadaire d'un abonnement Claude, au-dessus du prompt",
+  "plugins": [{ "name": "quotas-claude", "source": "./" }]
+}

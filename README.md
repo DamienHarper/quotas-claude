@@ -3,6 +3,18 @@
 Mod Claude Code qui affiche, au-dessus du prompt, la consommation des limites d'un abonnement
 Claude : la fenêtre glissante de 5 h et la fenêtre hebdomadaire.
 
+**Version réduite** (par défaut)
+
+![Version réduite : pastilles 5h et 7j avec jauge, % utilisé, delta et temps avant le reset](docs/reduite-clair.png)
+
+**Version complète**, en thème clair (en avance) et en thème sombre (en retard)
+
+![Version complète en thème clair : +29,0 % d'avance sur la semaine](docs/complete-clair.png)
+
+![Version complète en thème sombre : −38,0 % de retard sur la fenêtre de 5 h](docs/complete-sombre.png)
+
+*Rendus générés à partir du code du mod, avec des valeurs d'exemple.*
+
 ## Ce qu'il affiche
 
 - **Le delta** : temps écoulé dans la fenêtre moins quota utilisé. Positif, tu as de l'avance

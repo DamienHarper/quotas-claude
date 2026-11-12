@@ -400,16 +400,22 @@ export const register: Register = on => {
       <Box flexDirection="row" gap="sm">
         <Svg source={drawing.source} alt={describe(m, at)} width={drawing.width} height={drawing.height} />
         {isComplete ? (
-          <Box paddingY="xs" flexDirection="column" gap="xs">
+          // Le desktop semble ignorer `gap` (comme `alignItems`) : l'espace entre les boutons
+          // vient du padding de la Box propre à chacun, seul réglage dont l'effet est constaté.
+          <Box paddingY="xs" flexDirection="column">
             {windows.map(kind => (
-              <Button
-                key={`fenetre-${kind}`}
-                label={SHORT[kind] ?? kind}
-                variant={chosen === kind ? 'primary' : 'secondary'}
-                onPress={() => update($, focus, current => (current === kind ? 'auto' : kind))}
-              />
+              <Box key={`case-${kind}`} paddingY="xs">
+                <Button
+                  key={`fenetre-${kind}`}
+                  label={SHORT[kind] ?? kind}
+                  variant={chosen === kind ? 'primary' : 'secondary'}
+                  onPress={() => update($, focus, current => (current === kind ? 'auto' : kind))}
+                />
+              </Box>
             ))}
-            {toggle}
+            <Box paddingTop="md" paddingBottom="xs">
+              {toggle}
+            </Box>
           </Box>
         ) : (
           <Box paddingY="xs">{toggle}</Box>

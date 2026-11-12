@@ -402,18 +402,23 @@ export const register: Register = on => {
         {isComplete ? (
           // Le desktop semble ignorer `gap` (comme `alignItems`) : l'espace entre les boutons
           // vient du padding de la Box propre à chacun, seul réglage dont l'effet est constaté.
+          // 5h et 7j côte à côte (l'espace entre eux : padding à droite de chaque case sauf la
+          // dernière), Réduire dessous. Chaque case garde un padding vertical : une Box sans
+          // style semble ignorée par le desktop, et son bouton partirait ailleurs.
           <Box paddingY="xs" flexDirection="column">
-            {windows.map(kind => (
-              <Box key={`case-${kind}`} paddingY="xs">
-                <Button
-                  key={`fenetre-${kind}`}
-                  label={SHORT[kind] ?? kind}
-                  variant={chosen === kind ? 'primary' : 'secondary'}
-                  onPress={() => update($, focus, current => (current === kind ? 'auto' : kind))}
-                />
-              </Box>
-            ))}
-            <Box paddingTop="md" paddingBottom="xs">
+            <Box paddingY="xs" flexDirection="row">
+              {windows.map((kind, i) => (
+                <Box key={`case-${kind}`} paddingY="xs" paddingRight={i < windows.length - 1 ? 'sm' : 0}>
+                  <Button
+                    key={`fenetre-${kind}`}
+                    label={SHORT[kind] ?? kind}
+                    variant={chosen === kind ? 'primary' : 'secondary'}
+                    onPress={() => update($, focus, current => (current === kind ? 'auto' : kind))}
+                  />
+                </Box>
+              ))}
+            </Box>
+            <Box paddingTop="sm" paddingBottom="xs">
               {toggle}
             </Box>
           </Box>

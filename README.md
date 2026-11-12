@@ -13,7 +13,8 @@ Claude : la fenêtre glissante de 5 h et la fenêtre hebdomadaire.
 
 ![Version complète en thème sombre : −38,0 % de retard sur la fenêtre de 5 h](docs/complete-sombre.png)
 
-*Rendus générés à partir du code du mod, avec des valeurs d'exemple.*
+*Rendus générés à partir du code du mod, avec des valeurs d'exemple. Les boutons, dessinés par
+l'app à droite de la bande, n'y figurent pas.*
 
 ## Ce qu'il affiche
 
@@ -21,12 +22,28 @@ Claude : la fenêtre glissante de 5 h et la fenêtre hebdomadaire.
   (vert) ; négatif, tu consommes plus vite que le temps ne passe (ambre, puis rouge).
 - **Version réduite** (par défaut) : une ligne de pastilles `5h` et `7j`, chacune avec sa
   jauge, le % utilisé, le delta et le temps avant le reset.
-- **Version complète** : le delta en grand pour la fenêtre la plus serrée, une grande barre
-  avec le curseur du temps écoulé, le coût de la session et les pastilles.
+- **Version complète** : le delta en grand pour une fenêtre, une grande barre avec le curseur
+  du temps écoulé, le coût de la session et les pastilles.
 - Les couleurs suivent le thème clair ou sombre de l'app.
 
-Le bouton **Détails** / **Réduire** bascule entre les deux versions sans rien écrire dans la
-conversation. `/quotas off` masque la bande, `/quotas` la réaffiche.
+## Boutons
+
+À droite de la bande :
+
+```
+Version réduite        Version complète
+                       [ 5h ] [ 7j ]
+[ Détails ]            [  Réduire  ]
+```
+
+- **Détails** / **Réduire** : bascule entre les deux versions.
+- **5h** / **7j** (version complète) : met cette fenêtre en grand ; le bouton actif est mis en
+  avant et le choix est retenu. Un second clic sur le bouton actif revient au choix
+  automatique : la fenêtre la plus serrée (le plus petit delta). C'est le comportement par
+  défaut, sans bouton mis en avant.
+
+Les boutons ne passent pas par la conversation : un clic ne coûte aucun token.
+`/quotas off` masque la bande, `/quotas` la réaffiche.
 
 ## Coût
 
@@ -65,3 +82,7 @@ claude plugin update quotas-claude
 ```
 
 puis `/reload-plugins` dans la session.
+
+Ne garder qu'une copie du mod active : deux copies du même nom (par exemple celle de ce dépôt
+et celle d'une bibliothèque d'organisation) se masquent l'une l'autre, et c'est parfois
+l'ancienne qui s'affiche.

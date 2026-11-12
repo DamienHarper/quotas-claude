@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { Register, SessionCost, SessionRateLimit } from 'claude-code'
 
-import type { Meter, Mode, Quota } from '../types'
+import type { Focus, Meter, Mode, Quota } from '../types'
 
 const HOUR = 3_600_000
 const DURATION: Record<string, number> = { five_hour: 5 * HOUR, seven_day: 168 * HOUR }
@@ -11,6 +11,7 @@ const SHORT: Record<string, string> = { five_hour: '5h', seven_day: '7j' }
 const meter = atom({ plugin: 'quotas-claude', key: 'meter' } as const, { quotas: [] }, { shape: 'meter-1' })
 const now = atom({ plugin: 'quotas-claude', key: 'now' } as const, 0)
 const mode = atom({ plugin: 'quotas-claude', key: 'mode' } as const, 'reduite')
+const focus = atom({ plugin: 'quotas-claude', key: 'focus' } as const, 'auto')
 
 /*
  * Deux palettes, choisies par le thème de l'app (`prefers-color-scheme`) dans le
@@ -245,10 +246,11 @@ const pills = (m: Meter, readings: Reading[], y: number): { svg: string; height:
 
 type Drawing = { source: string; width: number; height: number }
 
-const band = (m: Meter, at: number): Drawing => {
+const band = (m: Meter, at: number, chosen: Focus): Drawing => {
   const readings = m.quotas.filter(q => DURATION[q.kind]).map(q => readQuota(q, at))
-  // Le grand bloc montre la fenêtre la plus urgente : le plus petit delta.
-  const focus = [...readings].sort((a, b) => (a.delta ?? Infinity) - (b.delta ?? Infinity))[0]
+  // Le grand bloc montre la fenêtre choisie ; à défaut, la plus serrée (le plus petit delta).
+  const urgent = [...readings].sort((a, b) => (a.delta ?? Infinity) - (b.delta ?? Infinity))[0]
+  const focus = readings.find(r => r.quota.kind === chosen) ?? urgent
 
   const top = focus ? hero(focus, 8) : { svg: '', height: 0 }
   const pillsY = 8 + top.height + 12
@@ -376,21 +378,42 @@ export const register: Register = on => {
 
     // Le bouton bascule l'état du mod sans passer par la conversation : zéro token.
     const isComplete = shown === 'complete'
-    const drawing = isComplete ? band(m, at) : strip(m, at)
+    const chosen = await read($, focus)
+    const drawing = isComplete ? band(m, at, chosen) : strip(m, at)
+    const toggle = (
+      <Button
+        key="bascule"
+        label={isComplete ? 'Réduire' : 'Détails'}
+        dimColor
+        onPress={() => update($, mode, () => (isComplete ? 'reduite' : 'complete'))}
+      />
+    )
+    // Version complète : un bouton par fenêtre ; un clic la met en grand, un second clic
+    // sur le bouton actif rend la main au choix automatique (la fenêtre la plus serrée).
+    const windows = m.quotas
+      .map(q => q.kind)
+      .filter((kind): kind is Exclude<Focus, 'auto'> => kind === 'five_hour' || kind === 'seven_day')
     return (
       // Observé sur le desktop : un bouton nu (ou dans une Box sans style) part en haut à
       // droite de la bande ; dans une Box avec du padding, il est centré à côté du SVG.
       // Le padding est symétrique pour que le centrage tombe pile sur les pastilles.
       <Box flexDirection="row" gap="sm">
         <Svg source={drawing.source} alt={describe(m, at)} width={drawing.width} height={drawing.height} />
-        <Box paddingY="xs">
-          <Button
-            key="bascule"
-            label={isComplete ? 'Réduire' : 'Détails'}
-            dimColor
-            onPress={() => update($, mode, () => (isComplete ? 'reduite' : 'complete'))}
-          />
-        </Box>
+        {isComplete ? (
+          <Box paddingY="xs" flexDirection="column" gap="xs">
+            {windows.map(kind => (
+              <Button
+                key={`fenetre-${kind}`}
+                label={SHORT[kind] ?? kind}
+                variant={chosen === kind ? 'primary' : 'secondary'}
+                onPress={() => update($, focus, current => (current === kind ? 'auto' : kind))}
+              />
+            ))}
+            {toggle}
+          </Box>
+        ) : (
+          <Box paddingY="xs">{toggle}</Box>
+        )}
       </Box>
     )
   })
